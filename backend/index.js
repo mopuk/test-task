@@ -1,9 +1,15 @@
 const express = require("express");
 const app = express();
 const db = require("./models");
+const cors = require("cors");
 const { Op } = require("sequelize");
 const { connectDB } = require("./database");
 
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+  }),
+);
 app.use(express.json());
 
 async function get_article_by_id(id, res) {

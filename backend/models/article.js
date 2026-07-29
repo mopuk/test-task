@@ -28,7 +28,10 @@ module.exports = (sequelize) => {
   );
 
   Article.associate = (models) => {
-    Article.hasMany(models.Comment, { foreignKey: "articleId" });
+    Article.hasMany(models.Comment, {
+      foreignKey: "articleId",
+      onDelete: "CASCADE",
+    });
   };
 
   return Article;

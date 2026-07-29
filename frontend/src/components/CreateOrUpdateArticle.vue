@@ -11,28 +11,23 @@
     ></v-text-field>
     <v-textarea v-model="form.content" class="h-70" no-resize></v-textarea>
     <div class="flex justify-between">
-      <v-btn>Cancel</v-btn> <v-btn @click="submitArticle">Confirm</v-btn>
+      <v-btn @click="cancelEditing">Cancel</v-btn> <v-btn @click="updateArticle">Confirm</v-btn>
     </div>
   </v-form>
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { reactive, defineEmits } from 'vue'
 import axios from 'axios'
 
 const props = defineProps({
-  mode: {
-    type: String,
-    required: true,
-    validator: (value) => ['create', 'edit'].includes(value),
-  },
-  data: {
+  article: {
     type: Object,
     default: null,
   },
 })
 
-const initialData = mode === 'edit' ? props.data : null
+const emit = defineEmits(['cancel', 'save'])
 
 const form = reactive({
   title: props.mode == 'edit' ? props.data.title : '',
@@ -40,7 +35,7 @@ const form = reactive({
   id: props.mode === 'edit' ? props.data.id : null,
 })
 
-function submitArticle() {
+/* function submitArticle() {
   if (props.mode === 'edit') {
     createArticle()
   } else {
@@ -53,14 +48,12 @@ async function createArticle() {
     content: form.content,
   }
   const response = await createArticle(article)
-}
+} */
 
 async function updateArticle() {
-  const newArticle = {
-    title: form.title,
-    content: form.content,
-  }
-
-  const response = await updateArticle(form.id, article)
+  emit('save', article)
+}
+async function cancelEditing() {
+  emit('cancel')
 }
 </script>

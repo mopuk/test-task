@@ -20,7 +20,7 @@ app.get("/api/v1/articles", async (req, res) => {
   res.json(articles);
 });
 
-app.get("/api/v1/article/:id", async (req, res) => {
+app.get("/api/v1/articles/:id", async (req, res) => {
   const { id } = req.params;
   const article = await get_article_by_id(id, res);
   if (!article) return;
@@ -28,7 +28,7 @@ app.get("/api/v1/article/:id", async (req, res) => {
   res.json(article);
 });
 
-app.post("/api/v1/article", async (req, res) => {
+app.post("/api/v1/articles", async (req, res) => {
   const article = await db.Article.create({
     title: req.body.title,
     content: req.body.content,
@@ -37,7 +37,7 @@ app.post("/api/v1/article", async (req, res) => {
   res.status(201).json(article);
 });
 
-app.patch("/api/v1/article/:id", async (req, res) => {
+app.patch("/api/v1/articles/:id", async (req, res) => {
   const { id } = req.params;
   const article = await get_article_by_id(id, res);
   if (!article) return;
@@ -53,7 +53,7 @@ app.patch("/api/v1/article/:id", async (req, res) => {
   res.status(200).json(article);
 });
 
-app.delete("/api/v1/article/:id", async (req, res) => {
+app.delete("/api/v1/articles/:id", async (req, res) => {
   const { id } = req.params;
   const article = await get_article_by_id(id, res);
   if (!article) return;
@@ -78,7 +78,7 @@ async function get_comment_by_id(article_id, id, res) {
   return comment;
 }
 // Comments routing
-app.get("/api/v1/article/:id/comments", async (req, res) => {
+app.get("/api/v1/articles/:id/comments", async (req, res) => {
   const { id } = req.params;
 
   const article = await get_article_by_id(id, res); // check if article exist
@@ -93,7 +93,7 @@ app.get("/api/v1/article/:id/comments", async (req, res) => {
   res.status(200).json(comments);
 });
 
-app.get("/api/v1/article/:id/comment/:comment_id", async (req, res) => {
+app.get("/api/v1/articles/:id/comments/:comment_id", async (req, res) => {
   const { id, comment_id } = req.params;
 
   const article = await get_article_by_id(id, res); // check if article exist
@@ -104,7 +104,7 @@ app.get("/api/v1/article/:id/comment/:comment_id", async (req, res) => {
   res.status(200).json(comment);
 });
 
-app.post("/api/v1/article/:id/comment", async (req, res) => {
+app.post("/api/v1/articles/:id/comments", async (req, res) => {
   const { id } = req.params;
   const article = await get_article_by_id(id, res); // check if article exist
   if (!article) return;
@@ -117,7 +117,7 @@ app.post("/api/v1/article/:id/comment", async (req, res) => {
   res.status(201).json(comment);
 });
 
-app.patch("/api/v1/article/:id/comment/:comment_id", async (req, res) => {
+app.patch("/api/v1/articles/:id/comments/:comment_id", async (req, res) => {
   const { id, comment_id } = req.params;
   const article = await get_article_by_id(id, res); // check if article exist
   if (!article) return;
@@ -133,7 +133,7 @@ app.patch("/api/v1/article/:id/comment/:comment_id", async (req, res) => {
   res.status(200).json(comment);
 });
 
-app.delete("/api/v1/article/:id/comment/:comment_id", async (req, res) => {
+app.delete("/api/v1/articles/:id/comments/:comment_id", async (req, res) => {
   const { id, comment_id } = req.params;
 
   const article = await get_article_by_id(id, res); // check if article exist

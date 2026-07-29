@@ -6,16 +6,12 @@ const { DataTypes } = require("sequelize");
 
 module.exports = (sequalize) => {
   const Comment = sequalize.define(
-    "Article",
+    "Comment",
     {
       id: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true,
-      },
-      title: {
-        type: DataTypes.STRING,
-        allowNull: false,
       },
       content: {
         type: DataTypes.TEXT,
@@ -23,10 +19,12 @@ module.exports = (sequalize) => {
       },
     },
     {
-      tableName: "articles",
+      tableName: "comments",
     },
   );
   Comment.associate = (models) => {
-    Comment.belongsTo(models.Article, { foreignKEy: "articleId" });
+    Comment.belongsTo(models.Article, { foreignKey: "articleId" });
   };
+
+  return Comment;
 };

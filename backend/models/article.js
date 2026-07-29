@@ -4,8 +4,8 @@ const { DataTypes } = require("sequelize");
  * @param {Sequelize} sequelize
  */
 
-module.exports = (sequalize) => {
-  const Article = sequalize.define(
+module.exports = (sequelize) => {
+  const Article = sequelize.define(
     "Article",
     {
       id: {
@@ -28,6 +28,8 @@ module.exports = (sequalize) => {
   );
 
   Article.associate = (models) => {
-    Article.hasOne(models.Comment, { foreignKey: "articleId" });
+    Article.hasMany(models.Comment, { foreignKey: "articleId" });
   };
+
+  return Article;
 };

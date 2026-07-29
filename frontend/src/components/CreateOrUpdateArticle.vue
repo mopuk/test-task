@@ -1,6 +1,6 @@
 <template>
   <v-form
-    class="flex flex-col shrink-0 absolute left-1/2 top-1/2 -translate-1/2 w-120 h-fit p-4 bg-zinc-900 rounded-xl"
+    class="flex flex-col shrink-0 fixed left-1/2 top-1/2 -translate-1/2 w-120 h-fit p-4 bg-zinc-900 rounded-xl"
   >
     <v-text-field
       v-model="form.title"
@@ -9,7 +9,12 @@
       type="text"
       clearable
     ></v-text-field>
-    <v-textarea v-model="form.content" class="h-70" no-resize></v-textarea>
+    <v-textarea
+      v-model="form.content"
+      class="h-70"
+      no-resize
+      placeholder="Article's content"
+    ></v-textarea>
     <div class="flex justify-between">
       <v-btn @click="cancelEditing">Cancel</v-btn> <v-btn @click="updateArticle">Confirm</v-btn>
     </div>
@@ -18,7 +23,6 @@
 
 <script setup>
 import { reactive, defineEmits } from 'vue'
-import axios from 'axios'
 
 const props = defineProps({
   article: {
@@ -30,9 +34,8 @@ const props = defineProps({
 const emit = defineEmits(['cancel', 'save'])
 
 const form = reactive({
-  title: props.mode == 'edit' ? props.data.title : '',
-  content: props.mode == 'edit' ? props.data.content : '',
-  id: props.mode === 'edit' ? props.data.id : null,
+  title: props.article.title || '',
+  content: props.article.content || '',
 })
 
 /* function submitArticle() {
@@ -51,7 +54,12 @@ async function createArticle() {
 } */
 
 async function updateArticle() {
-  emit('save', article)
+  const newArticle = {
+    id: props.article.id,
+    title: form.title,
+    content: form.content,
+  }
+  emit('save', newArticle)
 }
 async function cancelEditing() {
   emit('cancel')

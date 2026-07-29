@@ -1,10 +1,9 @@
 <template>
-  <div class="m-4 p-4 flex flex-col justify-center items-center">
+  <div class="m-4 p-4 flex flex-col justify-center items-center relative">
     <ArticlesList :articles="articles" @edit="handleOpenModal" @delete="handleDeleteArticle" />
     <CreateOrUpdateArticle
       v-if="selectedArticle"
-      :mode="selectedArticle.mode"
-      :data="selectedArticle.value"
+      :article="selectedArticle"
       @save="handleSaveArticle"
       @cancel="handleCancelEditing"
     />
@@ -33,9 +32,12 @@ async function handleCancelEditing() {
 }
 
 async function handleSaveArticle(article) {
-  const response = await updateArticle(...article)
+  const response = await updateArticle(article)
+  selectedArticle.value = null
+  articles.value = await getArticles()
 }
 async function handleDeleteArticle(article) {
-  const response = await deleteArticle(...article)
+  const response = await deleteArticle(article)
+  articles.value = await getArticles()
 }
 </script>

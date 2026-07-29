@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const api_url = process.env.BACKEND_URL + '/api/v1/'
 
-const temp_articles = [
+let temp_articles = [
   {
     id: 1,
     title: 'Getting Started with Vue 3',
@@ -52,26 +52,34 @@ const temp_articles = [
       'Axios allows Vue applications to communicate with backend APIs by sending HTTP requests and handling responses.',
   },
 ]
-export async function createArticle(title, content) {
-  const article = {
-    title: title,
-    content: content,
-  }
-  const response = await axios.post(api_url + '/articles', article)
+export async function createArticle(article) {
+  const response = await axios.post(api_url + '/articles')
   return response.data
 }
 
-export async function updateArticle(title, content) {
-  const article = {
-    title: title,
-    content: content,
+export async function updateArticle(article) {
+  //const response = await axios.patch(api_url + '/articles', article)
+  //return response.data
+
+  const articleInd = temp_articles.findIndex((acc) => acc.id === article.id)
+
+  if (articleInd !== -1) {
+    temp_articles[articleInd] = { ...article }
   }
-  const response = await axios.patch(api_url + '/articles', article)
-  return response.data
 }
 
 export async function getArticles() {
   //const response = await axios.get(api_url + '/articles')
   //return response.data
-  return temp_articles
+  return [...temp_articles]
+}
+
+export async function deleteArticle(article) {
+  // const response = await axios.delete(api_url + '/articles/' + article.id)
+
+  const articleInd = temp_articles.findIndex((acc) => acc?.id === article.id)
+
+  if (articleInd !== -1) {
+    temp_articles.splice(articleInd, 1)
+  }
 }

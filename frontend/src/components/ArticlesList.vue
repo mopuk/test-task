@@ -90,7 +90,7 @@ const props = defineProps({
 const emit = defineEmits(['edit', 'delete'])
 
 function handleEdit(article) {
-  emit('edit', article, 'edit')
+  emit('edit', article)
 }
 
 function handleDelete(article) {

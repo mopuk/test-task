@@ -13,25 +13,51 @@
         </h1>
         <p>{{ article.content }}</p>
       </div>
-      <CommentsList :article_id="Number(route.params.id)" />
+      <CommentsList
+        ref="commentsList"
+        :article_id="Number(route.params.id)"
+        @edit="handleEditModal"
+        @delete="handleDeleteComment"
+        @create="handleCreateModal"
+      />
+    </div>
+    <div v-if="selectedComment">
+      <CreateOrUpdateComment
+        :mode="selectedMode"
+        :comment="selectedComment"
+        @save="handleSaveComment"
+        @cancel="handleCancelEditing"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
 import CommentsList from "@/components/CommentsList.vue";
-import { getArticle } from "@/services.js";
-import { onMounted, ref } from "vue";
+import CreateOrUpdateComment from "@/components/CreateOrUpdateComment.vue";
+import {
+  getArticle,
+  createComment,
+  deleteComment,
+  updateComment,
+} from "@/services.js";
+import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
 const article = ref(null);
+const articleId = ref(null);
 const isLoading = ref(true);
 const error = ref(null);
+const commentsList = ref(null);
+
+const selectedComment = ref(null);
+const selectedMode = ref(null);
 
 onMounted(async () => {
   try {
     article.value = await getArticle(route.params.id);
+    articleId.value = article.value.id;
   } catch (err) {
     error.value = err;
     console.error(err);
@@ -39,6 +65,43 @@ onMounted(async () => {
     isLoading.value = false;
   }
 });
+
+async function handleEditModal(comment) {
+  selectedComment.value = {
+    id: comment.id,
+    content: comment.content,
+  };
+  selectedMode.value = "edit";
+}
+
+async function handleCreateModal() {
+  selectedComment.value = {
+    title: "",
+    content: "",
+  };
+  selectedMode.value = "create";
+}
+
+async function handleCancelEditing() {
+  selectedComment.value = null;
+  selectedMode.value = null;
+}
+
+async function handleSaveComment(comment) {
+  if (selectedMode.value === "create") {
+    const response = await createComment(articleId.value, comment);
+  } else {
+    const response = await updateComment(articleId.value, comment);
+  }
+
+  selectedComment.value = null;
+  selectedMode.value = null;
+  await commentsList.value.loadComments();
+}
+async function handleDeleteComment(comment) {
+  const response = await deleteComment(articleId.value, comment);
+  comments.value = await getComments();
+}
 </script>
 
 <style>

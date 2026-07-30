@@ -115,7 +115,7 @@ function handleEdit(article) {
 }
 
 function handleDelete(article) {
-  emit("delete", article);
+  emit("delete", article.id);
 }
 
 function handleCreate() {

@@ -1,7 +1,8 @@
 <template>
-  <div v-if="isLoading" class="spinner-container">
+  <div v-if="loading" class="spinner-container">
     <div class="spinner"></div>
   </div>
+  <div v-else-if="error">Ошибка: {{ error.message }}</div>
   <div
     v-else
     class="w-screen min-h-screen h-fit p-4 flex flex-col justify-center items-center"
@@ -14,7 +15,6 @@
         <p>{{ article.content }}</p>
       </div>
       <CommentsList
-        ref="commentsList"
         :article_id="Number(route.params.id)"
         @edit="handleEditModal"
         @delete="handleDeleteComment"
@@ -35,36 +35,29 @@
 <script setup>
 import CommentsList from "@/components/CommentsList.vue";
 import CreateOrUpdateComment from "@/components/CreateOrUpdateComment.vue";
-import {
-  getArticle,
-  createComment,
-  deleteComment,
-  updateComment,
-} from "@/services.js";
-import { computed, onMounted, ref } from "vue";
+
+import { computed, watch, ref } from "vue";
 import { useRoute } from "vue-router";
+import { useStore } from "vuex";
+
+const store = useStore();
 
 const route = useRoute();
-const article = ref(null);
-const articleId = ref(null);
-const isLoading = ref(true);
-const error = ref(null);
-const commentsList = ref(null);
+const article = computed(() => store.state.articles.currentArticle);
+const articleId = computed(() => article.value?.id ?? null);
+const loading = computed(() => store.state.articles.loading);
+const error = computed(() => store.state.articles.error);
 
 const selectedComment = ref(null);
 const selectedMode = ref(null);
 
-onMounted(async () => {
-  try {
-    article.value = await getArticle(route.params.id);
-    articleId.value = article.value.id;
-  } catch (err) {
-    error.value = err;
-    console.error(err);
-  } finally {
-    isLoading.value = false;
-  }
-});
+watch(
+  () => route.params.id,
+  async (id) => {
+    await store.dispatch("articles/fetchArticle", id);
+  },
+  { immediate: true },
+);
 
 async function handleEditModal(comment) {
   selectedComment.value = {
@@ -89,18 +82,24 @@ async function handleCancelEditing() {
 
 async function handleSaveComment(comment) {
   if (selectedMode.value === "create") {
-    const response = await createComment(articleId.value, comment);
+    await store.dispatch("comments/createComment", {
+      articleId: articleId.value,
+      comment: comment,
+    });
   } else {
-    const response = await updateComment(articleId.value, comment);
+    await store.dispatch("comments/updateComment", {
+      articleId: articleId.value,
+      comment: comment,
+    });
   }
-
   selectedComment.value = null;
   selectedMode.value = null;
-  await commentsList.value.loadComments();
 }
 async function handleDeleteComment(comment) {
-  const response = await deleteComment(articleId.value, comment);
-  comments.value = await getComments();
+  await store.dispatch("comments/deleteComment", {
+    articleId: articleId.value,
+    commentId: comment.id,
+  });
 }
 </script>
 

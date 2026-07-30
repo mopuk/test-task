@@ -1,16 +1,17 @@
 <template>
-  <div v-if="isLoading" class="spinner-container">
+  <div v-if="loading" class="spinner-container">
     <div class="spinner"></div>
   </div>
+  <div v-else-if="error">Ошибка: {{ error.message }}</div>
   <div v-else>
-    <div>
+    <div class="flex gap-4 items-center">
       <h2 class="text-xl font-bold mb-2 mt-4">Комментарии</h2>
-      <v-btn @click="handleCreate" class="">
+      <v-btn @click="handleCreate">
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
+          width="16"
+          height="16"
+          viewBox="6 6 12 12"
           fill="none"
           stroke="currentColor"
           stroke-width="2"
@@ -80,8 +81,11 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
-import { getComments } from "@/services.js";
+import { computed, onMounted, ref } from "vue";
+import { useStore } from "vuex";
+import { formatDate } from "@/services.js";
+
+const store = useStore();
 
 const props = defineProps({
   article_id: {
@@ -90,40 +94,18 @@ const props = defineProps({
   },
 });
 
-console.log(props.article_id);
 const emit = defineEmits(["edit", "delete"]);
 
-const isLoading = ref(true);
-const error = ref(null);
-const comments = ref([]);
+const comments = computed(() => store.state.comments.comments);
+const loading = computed(() => store.state.comments.loading);
+const error = computed(() => store.state.comments.error);
 
 onMounted(async () => {
   try {
-    comments.value = await getComments(props.article_id);
+    await store.dispatch("comments/fetchComments", props.article_id);
   } catch (err) {
-    error.value = err;
     console.error(err);
-  } finally {
-    isLoading.value = false;
   }
-});
-
-function formatDate(date) {
-  return new Date(date).toLocaleString("ru-RU", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
-async function loadComments() {
-  comments.value = await getComments(props.article_id);
-}
-
-defineExpose({
-  loadComments,
 });
 
 async function handleEdit(comment) {

@@ -4,6 +4,7 @@ import {
   createComment as createCommentAPI,
   updateComment as updateCommentAPI,
   deleteComment as deleteCommentAPI,
+  analyseComments as analyseCommentsAPI,
 } from "@/services.js";
 
 export default {
@@ -11,7 +12,8 @@ export default {
 
   state: () => ({
     comments: [],
-    loading: false,
+    loading: true,
+    analyticsLoading: false,
     error: null,
   }),
 
@@ -24,6 +26,9 @@ export default {
     },
     setLoading(state, value) {
       state.loading = value;
+    },
+    setAnalyticsLoading(state, value) {
+      state.analyticsLoading = value;
     },
     addComment(state, comment) {
       state.comments.push(comment);
@@ -70,6 +75,19 @@ export default {
     async deleteComment({ commit }, { articleId, commentId }) {
       await deleteCommentAPI(articleId, commentId);
       commit("removeComment", commentId);
+    },
+    async analyseComments({ commit }, { dateFrom, dateTo }) {
+      commit("setAnalyticsLoading", true);
+
+      try {
+        const comments = await analyseCommentsAPI(dateFrom, dateTo);
+        commit("setComments", comments);
+      } catch (err) {
+        commit("setError", err);
+        throw err;
+      } finally {
+        commit("setAnalyticsLoading", false);
+      }
     },
   },
 };

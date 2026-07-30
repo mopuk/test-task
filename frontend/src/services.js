@@ -28,42 +28,67 @@ export async function updateArticle(article) {
   return response.data;
 }
 
-export async function deleteArticle(article) {
-  const response = await axios.delete(api_url + "/articles/" + article.id);
+export async function deleteArticle(id) {
+  const response = await axios.delete(api_url + "/articles/" + id);
   return response.data;
 }
 
-export async function createComment(article_id, content) {
+export async function createComment(articleId, comment) {
   const response = await axios.post(
-    `${api_url}/articles/${article_id}/comments`,
-    content,
+    `${api_url}/articles/${articleId}/comments`,
+    {
+      content: comment.content,
+    },
   );
   return response.data;
 }
 
-export async function getComment(article_id, id) {
+export async function getComment(articleId, id) {
   const response = await axios.get(
-    `${api_url}/articles/${article_id}/comments/${id}`,
+    `${api_url}/articles/${articleId}/comments/${id}`,
   );
   return response.data;
 }
 
-export async function getComments(article_id) {
-  const response = await axios.get(
-    `${api_url}/articles/${article_id}/comments`,
-  );
+export async function getComments(articleId) {
+  const response = await axios.get(`${api_url}/articles/${articleId}/comments`);
   return response.data;
 }
 
-export async function updateComment(id, content) {
+export async function updateComment(articleId, comment) {
   const response = await axios.patch(
-    `${api_url}/articles/${article_id}/comments/${id}`,
-    content,
+    `${api_url}/articles/${articleId}/comments/${comment.id}`,
+    {
+      content: comment.content,
+    },
+  );
+
+  return response.data;
+}
+
+export async function deleteComment(articleId, commentId) {
+  const response = await axios.delete(
+    `${api_url}/articles/${articleId}/comments/${commentId}`,
   );
 }
 
-export async function deleteComment(id) {
-  const response = await axios.delete(
-    `${api_url}/articles/${article_id}/comments/${id}`,
-  );
+export async function analyseComments(dateFrom, dateTo) {
+  dateTo.setHours(23, 59, 59, 999);
+  const response = await axios.get(`${api_url}/analytic/comments/`, {
+    params: {
+      dateFrom: dateFrom.toISOString(),
+      dateTo: dateTo.toISOString(),
+    },
+  });
+  return response.data;
+}
+
+export function formatDate(date) {
+  return new Date(date).toLocaleString("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }

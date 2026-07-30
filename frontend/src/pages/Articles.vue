@@ -17,23 +17,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import {
-  getArticles,
-  updateArticle,
-  deleteArticle,
-  createArticle,
-} from "../services";
+import { ref, onMounted, computed } from "vue";
+import { useStore } from "vuex";
 import ArticlesGrid from "../components/ArticlesGrid.vue";
 import CreateOrUpdateArticle from "../components/CreateOrUpdateArticle.vue";
 
-const articles = ref([]);
+const store = useStore();
+
+const articles = computed(() => store.state.articles.articles);
 
 const selectedArticle = ref(null);
 const selectedMode = ref(null);
 
 onMounted(async () => {
-  articles.value = await getArticles();
+  await store.dispatch("articles/fetchArticles");
 });
 
 async function handleEditModal(article) {
@@ -60,17 +57,15 @@ async function handleCancelEditing() {
 
 async function handleSaveArticle(article) {
   if (selectedMode.value === "create") {
-    const response = await createArticle(article);
+    await store.dispatch("articles/createArticle", article);
   } else {
-    const response = await updateArticle(article);
+    await store.dispatch("articles/updateArticle", article);
   }
 
   selectedArticle.value = null;
   selectedMode.value = null;
-  articles.value = await getArticles();
 }
-async function handleDeleteArticle(article) {
-  const response = await deleteArticle(article);
-  articles.value = await getArticles();
+async function handleDeleteArticle(articleId) {
+  await store.dispatch("articles/deleteArticle", articleId);
 }
 </script>

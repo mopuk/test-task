@@ -12,7 +12,7 @@ export default {
   state: () => ({
     articles: [],
     currentArticle: null,
-    loading: false,
+    loading: true,
     error: null,
   }),
 

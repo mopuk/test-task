@@ -10,11 +10,8 @@ export async function createArticle(article) {
   return response.data;
 }
 
-export async function updateArticle(article) {
-  const response = await axios.patch(
-    api_url + "/articles/" + article.id,
-    article,
-  );
+export async function getArticle(id) {
+  const response = await axios.get(api_url + "/articles/" + id);
   return response.data;
 }
 
@@ -23,12 +20,50 @@ export async function getArticles() {
   return response.data;
 }
 
-export async function getArticle(id) {
-  const response = await axios.get(api_url + "/articles/" + id);
-  return response.data
+export async function updateArticle(article) {
+  const response = await axios.patch(
+    api_url + "/articles/" + article.id,
+    article,
+  );
+  return response.data;
 }
 
 export async function deleteArticle(article) {
   const response = await axios.delete(api_url + "/articles/" + article.id);
-  return response.data
+  return response.data;
+}
+
+export async function createComment(article_id, content) {
+  const response = await axios.post(
+    `${api_url}/articles/${article_id}/comments`,
+    content,
+  );
+  return response.data;
+}
+
+export async function getComment(article_id, id) {
+  const response = await axios.get(
+    `${api_url}/articles/${article_id}/comments/${id}`,
+  );
+  return response.data;
+}
+
+export async function getComments(article_id) {
+  const response = await axios.get(
+    `${api_url}/articles/${article_id}/comments`,
+  );
+  return response.data;
+}
+
+export async function updateComment(id, content) {
+  const response = await axios.patch(
+    `${api_url}/articles/${article_id}/comments/${id}`,
+    content,
+  );
+}
+
+export async function deleteComment(id) {
+  const response = await axios.delete(
+    `${api_url}/articles/${article_id}/comments/${id}`,
+  );
 }

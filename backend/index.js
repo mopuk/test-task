@@ -15,14 +15,15 @@ app.use(express.json());
 async function get_article_by_id(id, res) {
   const article = await db.Article.findByPk(id);
   if (!article) {
-    res.status(404).json({ message: "Article not found" });
-    return null;
+    return res.status(404).json({ message: "Article not found" });
   }
   return article;
 }
 // Articles routing
 app.get("/api/v1/articles", async (req, res) => {
-  const articles = await db.Article.findAll();
+  const articles = await db.Article.findAll({
+    order: [["id", "ASC"]],
+  });
   res.json(articles);
 });
 
@@ -94,6 +95,7 @@ app.get("/api/v1/articles/:id/comments", async (req, res) => {
     where: {
       articleId: id,
     },
+    order: [["id", "ASC"]],
   });
 
   res.status(200).json(comments);
@@ -158,8 +160,8 @@ app.get("/api/v1/analytic/comments/", async (req, res) => {
   const from = new Date(dateFrom);
   const to = new Date(dateTo);
 
-  if (isNaN(from) || isNaN(to)) {
-    res.status(400).json({ message: "Invalid dateTo or dateFrom" });
+  if (isNaN(from.getTime()) || isNaN(to.getTime())) {
+    return res.status(400).json({ message: "Invalid dateTo or dateFrom" });
   }
 
   const comments = await db.Comment.findAll({
@@ -188,7 +190,7 @@ app.get("/api/v1/analytic/comments/", async (req, res) => {
     }
     articles[articleId].comments.push(comment);
     return articles;
-  });
+  }, {});
   res.status(200).json(Object.values(grouped_comments));
 });
 

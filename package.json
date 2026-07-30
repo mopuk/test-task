@@ -19,5 +19,8 @@
   },
   "devDependencies": {
     "concurrently": "^10.0.4"
+  },
+  "dependencies": {
+    "vuex": "^4.1.0"
   }
 }

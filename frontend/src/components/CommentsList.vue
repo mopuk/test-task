@@ -2,36 +2,37 @@
   <div v-if="isLoading" class="spinner-container">
     <div class="spinner"></div>
   </div>
-  <div
-    v-else
-    class="w-screen min-h-screen h-fit p-4 flex flex-col justify-center items-center"
-  >
-    <div class="w-200 h-150 bg-zinc-800 rounded-xl px-8 py-6">
-      <div class="">
-        <h1 class="text-2xl font-bold">
-          {{ article.title }}
-        </h1>
-        <p>{{ article.content }}</p>
-      </div>
-      <CommentsList :article_id="Number(route.params.id)" />
+  <div v-else>
+    <h2 class="text-xl font-bold">Комментарии</h2>
+    <div v-for="comment in comments">
+      <p>{{ comment.content }}</p>
+      <span class="text-gray-400 text-xs">{{
+        comment.createdAt == comment.updatedAt
+          ? formatDate(comment.createdAt)
+          : `изменён: ${formatDate(comment.updatedAt)}`
+      }}</span>
     </div>
   </div>
 </template>
 
 <script setup>
-import CommentsList from "@/components/CommentsList.vue";
-import { getArticle } from "@/services.js";
 import { onMounted, ref } from "vue";
-import { useRoute } from "vue-router";
+import { getComments } from "@/services.js";
 
-const route = useRoute();
-const article = ref(null);
+const props = defineProps({
+  article_id: {
+    type: Number,
+    required: true,
+  },
+});
+
 const isLoading = ref(true);
 const error = ref(null);
+const comments = ref([]);
 
 onMounted(async () => {
   try {
-    article.value = await getArticle(route.params.id);
+    comments.value = await getComments(props.article_id);
   } catch (err) {
     error.value = err;
     console.error(err);
@@ -39,6 +40,16 @@ onMounted(async () => {
     isLoading.value = false;
   }
 });
+
+function formatDate(date) {
+  return new Date(date).toLocaleString("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
 </script>
 
 <style>

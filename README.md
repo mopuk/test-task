@@ -2,7 +2,7 @@
 
 ## Запуск
 
-1. git clone https://github.com/mopuk/test-task.git
+1. git clone https://github.com/mopuk/simple-blog.git
 2. cd test-task
 3. Зависимости для frontend:
    1. cd frontend
